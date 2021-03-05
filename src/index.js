@@ -4,7 +4,48 @@ const userRouter = require('./routers/user')
 const taskRouter = require('./routers/task')
 
 const app = express()
-const port = process.env.PORT || 3000
+//const port = process.env.PORT || 3000
+const port = process.env.PORT
+
+const multer = require('multer')
+const upload = multer({
+    dest: 'images',//folder name
+    limits:{
+        fileSize: 1000000
+
+    },
+    fileFilter(req, file, cb) {
+       // if(!file.originalname.endsWith('.pdf')){
+            
+       if(!file.originalname.match(/\.(doc|docx)$/)){
+
+       
+       return cb(new Error('Please upload a word document'))
+
+        }
+     
+        cb(undefined, true)
+       // cb(undefined, false)
+
+    }
+})
+app.post('/upload',upload.single('upload'), (req,res)=>{
+    res.send()
+},(error, req, res, next)=>{
+    res.status(400).send({error:error.message})
+})
+
+// app.use((req, res, next) => {
+//     if (req.method === 'GET') {
+//         res.send('GET requests are disabled')
+//     } else {
+//         next()
+//     }
+// })
+
+// app.use((req, res, next) => {
+//     res.status(503).send('Site is currently down. Check back soon!')
+// })
 
 app.use(express.json())
 app.use(userRouter)
@@ -14,17 +55,17 @@ app.listen(port, () => {
     console.log('Server is up on port ' + port)
 })
 
-const bcrypt = require('bcryptjs')
+const Task = require('./models/task')
+const User = require('./models/user')
 
-const myFunction = async () => {
-    const password = 'Red12345!'
-    const hashedPassword = await bcrypt.hash(password, 8)
+const main = async () => {
+    // const task = await Task.findById('5c2e505a3253e18a43e612e6')
+    // await task.populate('owner').execPopulate()
+    // console.log(task.owner)
 
-    console.log(password)
-    console.log(hashedPassword)
-
-    const isMatch = await bcrypt.compare('red12345!', hashedPassword)
-    console.log(isMatch)
+    // const user = await User.findById('5c2e4dcb5eac678a23725b5b')
+    // await user.populate('tasks').execPopulate()
+    // console.log(user.tasks)
 }
 
-myFunction()
+main()
